@@ -38,11 +38,29 @@ socket.on('join-room', (obj) => {
     }
     const ul = document.createElement('div')
     ul.id = 'messages'
+    const tot = document.createElement('div')
+    tot.id = 'tot'
+    const ai = document.createElement('div')
+    ai.id = 'ai'
+    tot.appendChild(ai)
     const form = document.createElement('form')
     form.id = 'send'
     const input = document.createElement('input')
     input.type = 'text'
     input.name = 'msg'
+    input.addEventListener('input', async () => {
+        try {
+            let a = await axios.post('/ai/ask', {
+                prompt: `just stright answer . suggest me next word or sentence for this "${input.value}"`
+            }, {
+                headers: `Bearer ${localStorage.getItem('token')}`
+            })
+            ai.innerHTML = a.data
+        }
+        catch (e) {
+            console.log(e)
+        }
+    })
     const but = document.createElement('button')
     but.type = 'button'
     but.id = 'my'
@@ -83,9 +101,10 @@ socket.on('join-room', (obj) => {
     form.appendChild(but)
     form.appendChild(input)
     form.appendChild(send)
+    tot.appendChild(form)
     document.querySelector('#dashboard').appendChild(div)
     document.querySelector('#dashboard').appendChild(ul)
-    document.querySelector('#dashboard').appendChild(form)
+    document.querySelector('#dashboard').appendChild(tot)
 
     for (let x of obj.messages) {
         messages(x)
